@@ -1,0 +1,41 @@
+Besoin:
+Client doit envoyer un texte au serveur et celui ci doit l'affiché
+
+Problème:
+Le seul moyen de communiquer entre le client et le serveur c'est avec des signals. Seul deux signal sont autorisés: SIGUSR1 and SIGUSR2.
+
+Solution:
+Pour chaque caractère, envoyer leurs code ascii en binaire à l'aide des 2 signaux. SIGUSR1 = 1 et SIGUSR2 = 0;
+utiliser les bitwises operators pour recréer le nombre et l'affiché.
+
+Exemple:
+1 = 0000 0001
+0 = 0000 0000
+
+Pour écrire 'A' soit 65 (0100 0001)
+on va recevoir, 0 puis 1 puis 0 0 0 0 0 1
+donc 0000 0000
+|=1 -> 0000 0001
+<<1 -> 0000 0010
+<<1 -> 0000 0100
+<<1 -> 0000 1000
+<<1 -> 0001 0000
+<<1 -> 0010 0000
+<<1 -> 0100 0000
+|=1 -> 0100 0001
+
+int main() {
+  int x = 196;
+  int y = x;
+  int i = 7;
+  while (i >= 0){
+  x = x >> i;
+  if (x % 2 == 0)
+  	  printf("%d\n", 0);
+  else if (x % 2 == 1)
+      printf("%d\n", 1);
+  x = y;
+  i--;
+  }
+  return 0;
+}
