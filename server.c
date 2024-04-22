@@ -15,34 +15,42 @@
 #include <signal.h>
 #include <unistd.h>
 
-void catcher(int signum) {
-  puts("catcher() has gained control");
+void    receive_signal(int sig)
+{
+	static unsigned char    c = 0;
+	static int              i = 0;
+	if (sig == 1)
+		c = c | 1;
+	if (sig == 1 && i != 7)
+	    c = c << 1;
+	if (sig == 0 && i != 7)
+	    c = c << 1;
+	i++;
+	if (i == 8)
+	{
+		write(1, &c, 1);
+		if (c == '\0')
+		{
+			write(1, "\n", 1);
+		}
+		i = 0;
+		c = 0;
+	}
 }
 
-void catcher_2(int signum) {
-  puts("2");
-}
+int		main(void)
+{
+	struct sigaction    sa;
 
-int main() {
-  struct   sigaction sact;
-  sigset_t sigset;
-
-  sigemptyset(&sact.sa_mask);
-  sact.sa_flags = 0;
-  sact.sa_handler = catcher;
-  sigaction(SIGUSR1, &sact, NULL);
-
-  puts("before first kill()");
-  kill(getpid(), SIGUSR1);
-  puts("before second kill()");
-
-  sigemptyset(&sigset);
-  sigaddset(&sigset, SIGUSR1);
-  sigprocmask(SIG_SETMASK, &sigset, NULL);
-  sact.sa_handler = catcher_2;
-  sigaction(SIGUSR2, &sact, NULL);
-
-  kill(getpid(), SIGUSR1);
-  kill(getpid(), SIGUSR2);
-  puts("after second kill()");
+	sa.sa_handler = receive_signal;
+	sa.sa_flags = 0;
+	sigemptyset(&sa.sa_mask);
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
+	printf("Server PID: %d\n", getpid());
+	while (1)
+	{
+		pause();
+	}
+	return (0);
 }
