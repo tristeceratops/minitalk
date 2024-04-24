@@ -6,7 +6,7 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:00 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/24 18:09:06 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/24 18:22:23 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,20 +26,20 @@ void    receive_signal(int sig, siginfo_t *info, void *ucontext)
 	if (sig == SIGUSR2 && i != 7)
 	    c = c << 1;
 	i++;
+	kill(info->si_pid, SIGUSR2);
+	usleep(50);
 	if (i == 8)
 	{
 		write(1, &c, 1);
 		if (c == '\0')
 		{
 			write(1, "\n", 1);
-			usleep(300);
 			kill(info->si_pid, SIGUSR1);	
+			usleep(50);
 		}
 		i = 0;
 		c = 0;
 	}
-	usleep(300);
-	kill(info->si_pid, SIGUSR2);
 }
 
 int		main(void)
