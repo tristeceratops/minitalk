@@ -6,12 +6,14 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:00 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/24 18:22:23 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/24 19:14:02 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "minitalk.h"
+
+char *str;
 
 void    receive_signal(int sig, siginfo_t *info, void *ucontext)
 {
@@ -19,6 +21,8 @@ void    receive_signal(int sig, siginfo_t *info, void *ucontext)
 	static int              i = 0;
 
 	(void)ucontext;
+	if (str == NULL)
+		str = malloc(1);
 	if (sig == SIGUSR1)
 		c = c | 1;
 	if (sig == SIGUSR1 && i != 7)
@@ -30,12 +34,19 @@ void    receive_signal(int sig, siginfo_t *info, void *ucontext)
 	usleep(50);
 	if (i == 8)
 	{
-		write(1, &c, 1);
+		char temp[2];
+		temp[0] = c;
+		temp[1] = '\0';
+		str = ft_strjoin(str, temp);
+		//write(1, &c, 1);
 		if (c == '\0')
 		{
+			ft_putstr_fd(str, 1);
 			write(1, "\n", 1);
 			kill(info->si_pid, SIGUSR1);	
 			usleep(50);
+			free(str);
+			str = NULL;
 		}
 		i = 0;
 		c = 0;
