@@ -6,32 +6,38 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:00 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/19 17:39:15 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/24 13:40:21 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#define _POSIX_SOURCE
-#include <stdio.h>
-#include <signal.h>
-#include <unistd.h>
 
-void    receive_signal(int sig)
+#include "minitalk.h"
+
+char	*g_str;
+
+void    receive_signal(int signum)
 {
-	static unsigned char    c = 0;
+	static char    c = 0;
 	static int              i = 0;
-	if (sig == 1)
+
+	if (g_str == NULL)
+		g_str = malloc(1);
+	if (signum == SIGUSR1)
 		c = c | 1;
-	if (sig == 1 && i != 7)
+	if (signum == SIGUSR1 && i != 7)
 	    c = c << 1;
-	if (sig == 0 && i != 7)
+	if (signum == SIGUSR2 && i != 7)
 	    c = c << 1;
 	i++;
 	if (i == 8)
 	{
-		write(1, &c, 1);
+		g_str = ft_strjoin(g_str, &c);
+		//write(1, &c, 1);
 		if (c == '\0')
 		{
-			write(1, "\n", 1);
+			printf("%s\n", g_str);
+			free(g_str);
+			g_str = NULL;
 		}
 		i = 0;
 		c = 0;
@@ -43,7 +49,7 @@ int		main(void)
 	struct sigaction    sa;
 
 	sa.sa_handler = receive_signal;
-	sa.sa_flags = 0;
+	sa.sa_flags = SA_SIGINFO;
 	sigemptyset(&sa.sa_mask);
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
