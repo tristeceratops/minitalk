@@ -6,7 +6,7 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:02 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/24 13:33:16 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/24 15:24:26 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void    send_signal(int pid, unsigned char c)
             kill(pid, SIGUSR2);
         else
             kill(pid, SIGUSR1);
-        usleep(84);
+		usleep(200);
     }
 }
 
@@ -47,9 +47,7 @@ int		main(int argc, char **argv)
 	i = 0;
 	while (str[i])
 	{
-		send_signal(pid, str[i]);
-		i++;
-        usleep(84);
+		send_signal(pid, str[i++]);
 	}
 	send_signal(pid, '\0');
 	return (0);
