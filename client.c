@@ -6,22 +6,20 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:02 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/24 18:42:00 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/25 13:44:36 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void    receive_signal(int sig)
-{
-	static int		i;
+int		confirmation;
 
-	if (sig == SIGUSR2)
-		i++;
-	if (sig == SIGUSR1)
-		printf("Signal received\nNumbers of bytes send: %d\n", i);
-	if (sig == SIGUSR1)
-		i = 0;
+void    receive_signal(int sig, siginfo_t *info, void *context)
+{
+	(void)context;
+	(void)info;
+	if (sig == SIGUSR1 || sig == SIGUSR2)
+		confirmation = 1;
 }
 
 void    send_signal(int pid, unsigned char c)
@@ -33,13 +31,37 @@ void    send_signal(int pid, unsigned char c)
     temp_char = c;
     while (i > 0)
     {
+		confirmation = 0;
         temp_char = c >> --i;
         if (temp_char % 2 == 0)
+		{
             kill(pid, SIGUSR2);
+			while (confirmation == 0)
+				;
+		}
         else
+		{
             kill(pid, SIGUSR1);
-		pause();
+			while (confirmation == 0)
+				;
+		}
     }
+}
+
+void	ft_check_parameters(int argc, char *argv[])
+{
+	int		index;
+
+	index = 0;
+	if (argc != 3)
+		exit(printf("Number of arguments invalid\n"));
+	while (argv[1][index] != '\0')
+	{
+		if (!ft_isdigit(argv[1][index]))
+			exit(printf("Error: Invalid PID\n"));
+		index++;
+	}
+	
 }
 
 int		main(int argc, char **argv)
@@ -48,17 +70,16 @@ int		main(int argc, char **argv)
 	int		pid;
 	char	*str;
 	struct sigaction    sa;
+	sigset_t			set;
 
-	sa.sa_handler = receive_signal;
-	sa.sa_flags = 0;
-	sigemptyset(&sa.sa_mask);
+	ft_check_parameters(argc, argv);
+	sigemptyset(&set);
+	sa.sa_handler = NULL;
+	sa.sa_mask = set;
+	sa.sa_flags = SA_SIGINFO;
+	sa.sa_sigaction = receive_signal;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
-	if (argc != 3)
-	{
-		write(1, "Error\n", 6);
-		return (1);
-	}
 	pid = ft_atoi(argv[1]);
 	str = argv[2];
 	i = 0;
@@ -67,5 +88,6 @@ int		main(int argc, char **argv)
 		send_signal(pid, str[i++]);
 	}
 	send_signal(pid, '\0');
+	confirmation = 0;
 	return (0);
 }
