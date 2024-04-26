@@ -6,7 +6,7 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:00 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/25 13:52:30 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/26 14:21:36 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int		main(void)
 	sa.sa_sigaction = receive_signal;
 	sigaction(SIGUSR1, &sa, NULL);
 	sigaction(SIGUSR2, &sa, NULL);
-	printf("Server PID: %d\n", getpid());
+	ft_printf("Server PID: %d\n", getpid());
 	while (1)
 	{
 		pause();

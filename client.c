@@ -6,7 +6,7 @@
 /*   By: ewoillar <ewoillar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/19 14:12:02 by ewoillar          #+#    #+#             */
-/*   Updated: 2024/04/25 13:44:36 by ewoillar         ###   ########.fr       */
+/*   Updated: 2024/04/26 14:21:14 by ewoillar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,11 @@ void	ft_check_parameters(int argc, char *argv[])
 
 	index = 0;
 	if (argc != 3)
-		exit(printf("Number of arguments invalid\n"));
+		exit(ft_printf("Number of arguments invalid\n"));
 	while (argv[1][index] != '\0')
 	{
 		if (!ft_isdigit(argv[1][index]))
-			exit(printf("Error: Invalid PID\n"));
+			exit(ft_printf("Error: Invalid PID\n"));
 		index++;
 	}
 	
